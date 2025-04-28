@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ID Holiday Calendar</title
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Borel&display=swap" rel="stylesheet">
+    <style>
+    :root {
+      --bg: #ffffff;
+      --accent: #d5658a;
+      --text: #333333;
+      --muted: #999999;
+      --today-bg: #e0e7ff;
+      --weekend-color: #a51313;
+      --holiday-color: #cc0000;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Borel', cursive; 
+      font-weight: 400;
+      font-style: normal;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .calendar {
+      width: 260px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--accent);
+      color: white;
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+
+    .calendar-header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      padding: 0.25rem 0.5rem;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    .calendar-days div:nth-child(1),
+    .calendar-days div:nth-child(7) {
+      color: var(--weekend-color);
+    }
+
+    .calendar-dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      padding: 0 0.5rem 1rem;
+    }
+
+    .calendar-dates div {
+      padding: 0.5rem 0;
+      font-size: 0.75rem;
+      color: var(--text);
+      border-radius: 6px;
+      margin: 1px;
+      position: relative;
+    }
+
+    .calendar-dates .today {
+      background-color: var(--today-bg);
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .calendar-dates .weekend {
+      color: var(--weekend-color);
+      font-weight: bold;
+    }
+
+    .calendar-dates .holiday {
+      color: var(--holiday-color);
+      font-weight: bold;
+    }
+
+    .calendar-dates div:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0.9;
+      z-index: 10;
+    }
+
+    .fade {
+      animation: fade 0.3s ease-in-out;
+    }
+
+    @keyframes fade {
+      from { opacity: 0.5; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="calendar">
+  <div class="calendar-header">
+    <button onclick="prevMonth()">&lt;</button>
+    <div id="monthYear"></div>
+    <button onclick="nextMonth()">&gt;</button>
+  </div>
+  <div class="calendar-days">
+    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+  <div class="calendar-dates fade" id="calendarDates"></div>
+</div>
+
+<script>
+  const monthYear = document.getElementById('monthYear');
+  const calendarDates = document.getElementById('calendarDates');
+  let current = new Date();
+  let holidayMap = new Map();
+
+  async function fetchHolidays(year) {
+    try {
+      const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/ID`);
+      const holidays = await res.json();
+      holidayMap.clear();
+      holidays.forEach(h => {
+        holidayMap.set(h.date, h.localName);
+      });
+    } catch (error) {
+      console.error("Failed to fetch holidays:", error);
+    }
+  }
+
+  async function renderCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    monthYear.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    calendarDates.innerHTML = '';
+    const startDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+
+    if (!holidayMap.size || [...holidayMap.keys()][0].split('-')[0] !== `${year}`) {
+      await fetchHolidays(year);
+    }
+
+    for (let i = 0; i < startDay; i++) {
+      calendarDates.innerHTML += `<div></div>`;
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const tempDate = new Date(year, month, day);
+      const weekday = tempDate.getDay();
+      const isoDate = tempDate.toISOString().split('T')[0];
+
+      const isToday = tempDate.toDateString() === new Date().toDateString();
+      const isWeekend = weekday === 0 || weekday === 6;
+      const holidayName = holidayMap.get(isoDate);
+
+      let classList = '';
+      if (isToday) classList += ' today';
+      if (isWeekend) classList += ' weekend';
+      if (holidayName) classList += ' holiday';
+
+      const tooltip = holidayName ? `data-tooltip="${holidayName}"` : '';
+      calendarDates.innerHTML += `<div class="${classList.trim()}" ${tooltip}>${day}</div>`;
+    }
+  }
+
+  function nextMonth() {
+    current.setMonth(current.getMonth() + 1);
+    renderCalendar(current);
+  }
+
+  function prevMonth() {
+    current.setMonth(current.getMonth() - 1);
+    renderCalendar(current);
+  }
+
+  renderCalendar(current);
+</script>
+
+</body>
+</html>
