@@ -186,17 +186,19 @@
     for (let day = 1; day <= totalDays; day++) {
       const tempDate = new Date(year, month, day);
       const weekday = tempDate.getDay();
-      const isoDate = tempDate.toISOString().split('T')[0];
-
+      const isoDate = tempDate.getFullYear() + '-' +
+        String(tempDate.getMonth() + 1).padStart(2, '0') + '-' +
+        String(tempDate.getDate()).padStart(2, '0');
+    
       const isToday = tempDate.toDateString() === new Date().toDateString();
       const isWeekend = weekday === 0 || weekday === 6;
       const holidayName = holidayMap.get(isoDate);
-
+    
       let classList = '';
       if (isToday) classList += ' today';
       if (isWeekend) classList += ' weekend';
       if (holidayName) classList += ' holiday';
-
+    
       const tooltip = holidayName ? `data-tooltip="${holidayName}"` : '';
       calendarDates.innerHTML += `<div class="${classList.trim()}" ${tooltip}>${day}</div>`;
     }
