@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pomodoro Timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Borel&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      max-width: 260px;
+      width: 100%;
+      text-align: center;
+      background: #D5658A; /* Same rose pink for the container */
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      padding: 20px;
+      color: #F5E1C0; /* Cream for text */
+    }
+
+    h1 {
+      font-family: 'Borel', cursive;
+      font-size: 1.4em;
+      color: #FFF; /* Cream for title */
+      margin-bottom: 10px;
+    }
+
+    #timer {
+      font-size: 2.5em;
+      font-weight: 600;
+      color: #F5E1C0; /* Timer text in cream */
+      margin-bottom: 15px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .controls button {
+      background-color: #FFF; /* Dark gray-green */
+      color: #D5658A;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      font-family: 'Inter', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .controls button:hover {
+      background-color: #c25578; /* Slightly darker shade for hover */
+    }
+
+    .break-button {
+      background-color: #8B5E3C; /* Brown for break buttons */
+      color: white;
+    }
+
+    .break-button:hover {
+      background-color: #744b32; /* Darker brown on hover */
+    }
+
+    .icon-button {
+      padding: 6px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .icon-button svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pomodoro Timer</h1>
+    <div id="timer">25:00</div>
+    <div class="controls">
+      <button onclick="startPomodoro()">Pomodoro</button>
+      <button class="break-button" onclick="startShortBreak()">Short Break</button>
+      <button class="break-button" onclick="startLongBreak()">Long Break</button>
+      <button class="icon-button" onclick="pauseTimer()" title="Pause">
+        <i data-lucide="pause"></i>
+      </button>
+      <button class="icon-button" onclick="resetTimer()" title="Reset">
+        <i data-lucide="rotate-ccw"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio elements -->
+  <audio id="startBeep">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+  <audio id="endBeep">
+    <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+
+  <script>
+    lucide.createIcons(); // render icons
+
+    let timerDuration = 25 * 60;
+    let timeLeft = timerDuration;
+    let timerInterval = null;
+    const display = document.getElementById("timer");
+
+    const startBeep = document.getElementById("startBeep");
+    const endBeep = document.getElementById("endBeep");
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function playBeep(beepElement, count = 3, delay = 300) {
+      let i = 0;
+      const interval = setInterval(() => {
+        beepElement.play();
+        i++;
+        if (i >= count) clearInterval(interval);
+      }, delay);
+    }
+
+    function startTimer(duration, label) {
+      clearInterval(timerInterval);
+      timeLeft = duration;
+      updateDisplay();
+      playBeep(startBeep, 3);
+
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          updateDisplay();
+        } else {
+          clearInterval(timerInterval);
+          playBeep(endBeep, 3);
+          alert(`${label} ended!`);
+        }
+      }, 1000);
+    }
+
+    function startPomodoro() {
+      timerDuration = 25 * 60;
+      startTimer(timerDuration, "Pomodoro");
+    }
+
+    function startShortBreak() {
+      timerDuration = 5 * 60;
+      startTimer(timerDuration, "Short Break");
+    }
+
+    function startLongBreak() {
+      timerDuration = 15 * 60;
+      startTimer(timerDuration, "Long Break");
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timeLeft = timerDuration;
+      updateDisplay();
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
