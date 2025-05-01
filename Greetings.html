@@ -39,12 +39,13 @@ h1 {
 }
 
 .card {
-    padding: 10px 10px 10px 10px;
+    display: flex;
+    align-items: center; /* vertical centering */
+    padding: 10px;
     border-radius: 12px;
     background: #ffffff;
     width: 85vw;
     color: #d5658a;
-    display: inline-block;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -80,13 +81,13 @@ h1 {
     padding-right: 15px;
     color: #464644;
 }
-.greet{
-    display:inline;
+        
+.greet {
     font-family: 'Borel', cursive;
     font-size: 1.5rem;
-    font-weight : bold;
-     padding-right: 15px;
-     float : left
+    font-weight: bold;
+    padding-right: 15px;
+    margin-right: 10px;
 }
 
     </style>
@@ -98,7 +99,7 @@ h1 {
   <div class="table-cell">
     <div class="card">
         <div class="greet" id="greet"></div>
-        <div style="display:inline; float: left">
+        <div>
             <div class="date" id="date"></div>
             <div class="clock">
                 <div class="time" id="hour"></div>
