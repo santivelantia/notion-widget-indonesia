@@ -110,10 +110,10 @@
 
   <!-- Audio elements -->
   <audio id="startBeep">
-    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+    <source src="plasterbrain__game-start.ogg" type="audio/ogg">
   </audio>
   <audio id="endBeep">
-    <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+    <source src="buttonchime02up.wav" type="audio/wav">
   </audio>
 
   <script>
@@ -133,20 +133,16 @@
       display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
-    function playBeep(beepElement, count = 3, delay = 300) {
-      let i = 0;
-      const interval = setInterval(() => {
-        beepElement.play();
-        i++;
-        if (i >= count) clearInterval(interval);
-      }, delay);
+    function playBeep(beepElement) {
+      beepElement.currentTime = 0; // rewind to start
+      beepElement.play();
     }
 
     function startTimer(duration, label) {
       clearInterval(timerInterval);
       timeLeft = duration;
       updateDisplay();
-      playBeep(startBeep, 3);
+      playBeep(startBeep);
 
       timerInterval = setInterval(() => {
         if (timeLeft > 0) {
@@ -154,7 +150,7 @@
           updateDisplay();
         } else {
           clearInterval(timerInterval);
-          playBeep(endBeep, 3);
+          playBeep(endBeep);
           alert(`${label} ended!`);
         }
       }, 1000);
