@@ -163,6 +163,41 @@
     }
   }
 
+    // Add missing holidays manually
+  function addManualHolidays() {
+    // Libur Nasional
+    holidayMap.set("2025-01-01", "Tahun Baru 2025");
+    holidayMap.set("2025-01-27", "Isra Mi’raj");
+    holidayMap.set("2025-01-29", "Tahun Baru Imlek");
+    holidayMap.set("2025-03-29", "Hari Suci Nyepi (Tahun Baru Saka 1947)");
+    holidayMap.set("2025-03-31", "Idul Fitri 1446 Hijriyah");
+    holidayMap.set("2025-04-01", "Idul Fitri 1446 Hijriyah");
+    holidayMap.set("2025-04-18", "Wafat Yesus Kristus");
+    holidayMap.set("2025-04-20", "Paskah");
+    holidayMap.set("2025-05-01", "Hari Buruh Internasional");
+    holidayMap.set("2025-05-12", "Hari Raya Waisak");
+    holidayMap.set("2025-05-29", "Kenaikan Yesus Kristus");
+    holidayMap.set("2025-06-01", "Hari Lahir Pancasila");
+    holidayMap.set("2025-06-06", "Idul Adha 1446 Hijriyah");
+    holidayMap.set("2025-06-27", "1 Muharram Tahun Baru Islam 1447 Hijriyah");
+    holidayMap.set("2025-08-17", "Proklamasi Kemerdekaan");
+    holidayMap.set("2025-09-05", "Maulid Nabi Muhammad SAW");
+    holidayMap.set("2025-12-25", "Kelahiran Yesus Kristus");
+
+    // Cuti Bersama (tampil warna merah muda)
+    holidayMap.set("2025-01-28", "Cuti bersama");
+    holidayMap.set("2025-03-28", "Cuti bersama");
+    holidayMap.set("2025-04-02", "Cuti bersama");
+    holidayMap.set("2025-04-03", "Cuti bersama");
+    holidayMap.set("2025-04-04", "Cuti bersama");
+    holidayMap.set("2025-04-07", "Cuti bersama");
+    holidayMap.set("2025-05-13", "Cuti bersama");
+    holidayMap.set("2025-05-30", "Cuti bersama");
+    holidayMap.set("2025-06-09", "Cuti bersama");
+    holidayMap.set("2025-12-26", "Cuti bersama");
+    // Add other missing holidays if needed
+  }
+
   async function renderCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -178,7 +213,9 @@
     if (!holidayMap.size || [...holidayMap.keys()][0].split('-')[0] !== `${year}`) {
       await fetchHolidays(year);
     }
-
+    
+    addManualHolidays(); // Add holidays manually
+    
     for (let i = 0; i < startDay; i++) {
       calendarDates.innerHTML += `<div></div>`;
     }
